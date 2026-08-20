@@ -1,0 +1,46 @@
+---
+import type { Dictionary } from "../i18n";
+
+interface Props {
+	t: Dictionary;
+}
+
+const { t } = Astro.props;
+---
+
+<section id="cta" class="scroll-mt-20 pb-20 sm:pb-28">
+	<div class="container-max section-pad">
+		<div
+			class="relative overflow-hidden rounded-3xl mesh-bg px-6 py-14 text-center text-white shadow-xl sm:px-12 sm:py-16"
+		>
+			<div
+				class="pointer-events-none absolute inset-0 opacity-30"
+				aria-hidden="true"
+				style="background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.15), transparent 50%);"
+			>
+			</div>
+			<div class="relative">
+				<h2 class="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+					{t.cta.title}
+				</h2>
+				<p class="mx-auto mt-4 max-w-xl text-pretty text-base text-slate-300">
+					{t.cta.body}
+				</p>
+				<div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+					<a
+						href="#features"
+						class="inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg transition hover:bg-indigo-50"
+					>
+						{t.cta.secondary}
+					</a>
+					<a
+						href="mailto:ytzhbit@gmail.com"
+						class="inline-flex rounded-full border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15"
+					>
+						{t.cta.primary}
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

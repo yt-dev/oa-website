@@ -1,0 +1,6 @@
+# 301 OA marketing site
+User-agent: *
+Allow: /
+
+# Host-relative so this file works on any domain (Pages preview or custom)
+Sitemap: /sitemap-index.xml

@@ -1,0 +1,101 @@
+---
+import type { Dictionary } from "../i18n";
+import type { Lang } from "../i18n/ui";
+import { languages, locales, pathForLang, STORAGE_KEY } from "../i18n/ui";
+
+interface Props {
+	lang: Lang;
+	t: Dictionary;
+}
+
+const { lang, t } = Astro.props;
+const path = Astro.url.pathname.replace(/^\/(en|zh|ja)/, "") || "/";
+
+const links = [
+	{ href: `#features`, label: t.nav.features },
+	{ href: `#organizations`, label: t.nav.forSchools },
+	{ href: `#security`, label: t.nav.security },
+	{ href: `#gallery`, label: t.nav.gallery },
+];
+---
+
+<header
+	class="sticky top-0 z-50 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl"
+>
+	<div class="container-max section-pad flex h-16 items-center justify-between gap-4">
+		<a href={pathForLang(lang)} class="group flex items-center gap-2.5">
+			<span
+				class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white shadow-md shadow-indigo-500/25"
+			>
+				301
+			</span>
+			<span class="text-sm font-semibold tracking-tight text-slate-900 sm:text-base">
+				OA
+				<span class="hidden font-normal text-slate-500 sm:inline">
+					{" "}
+					· {t.nav.brandSuffix}
+				</span>
+			</span>
+		</a>
+
+		<nav class="hidden items-center gap-1 md:flex" aria-label="Primary">
+			{
+				links.map((l) => (
+					<a
+						href={l.href}
+						class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+					>
+						{l.label}
+					</a>
+				))
+			}
+		</nav>
+
+		<div class="flex items-center gap-2 sm:gap-3">
+			<label class="sr-only" for="lang-select">{t.lang.label}</label>
+			<select
+				id="lang-select"
+				class="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 sm:text-sm"
+				aria-label={t.lang.label}
+				data-storage-key={STORAGE_KEY}
+			>
+				{
+					locales.map((l) => (
+						<option
+							value={pathForLang(l, path === "/" ? "" : path)}
+							data-lang={l}
+							selected={l === lang}
+						>
+							{languages[l]}
+						</option>
+					))
+				}
+			</select>
+			<script>
+				const select = document.getElementById("lang-select");
+				if (select instanceof HTMLSelectElement) {
+					select.addEventListener("change", () => {
+						const opt = select.selectedOptions[0];
+						const lang = opt?.dataset.lang;
+						const key = select.dataset.storageKey;
+						if (lang && key) {
+							try {
+								localStorage.setItem(key, lang);
+							} catch {
+								/* ignore */
+							}
+						}
+						if (select.value) location.href = select.value;
+					});
+				}
+			</script>
+
+			<a
+				href="#cta"
+				class="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-600 sm:inline-flex"
+			>
+				{t.nav.cta}
+			</a>
+		</div>
+	</div>
+</header>

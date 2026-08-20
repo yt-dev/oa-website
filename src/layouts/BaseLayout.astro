@@ -1,0 +1,152 @@
+---
+import "../styles/global.css";
+import type { Lang } from "../i18n/ui";
+import { localeTags, locales, pathForLang, STORAGE_KEY } from "../i18n/ui";
+import type { Dictionary } from "../i18n";
+
+interface Props {
+	lang: Lang;
+	t: Dictionary;
+	/** Optional page-specific title override */
+	title?: string;
+	description?: string;
+	/** Path without locale, e.g. "" or "privacy" */
+	path?: string;
+}
+
+const {
+	lang,
+	t,
+	title = t.meta.title,
+	description = t.meta.description,
+	path = "",
+} = Astro.props;
+
+const site = Astro.site ?? new URL("https://oa.example.com");
+const canonicalPath = pathForLang(lang, path);
+const canonical = new URL(canonicalPath, site).href;
+const ogImage = new URL("/images/og-default.webp", site).href;
+const localeTag = localeTags[lang];
+
+const alternateLinks = locales.map((l) => ({
+	lang: localeTags[l],
+	href: new URL(pathForLang(l, path), site).href,
+}));
+
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@graph": [
+		{
+			"@type": "Organization",
+			name: "301 OA",
+			url: new URL("/", site).href,
+			description: t.meta.description,
+		},
+		{
+			"@type": "WebSite",
+			name: "301 OA",
+			url: canonical,
+			inLanguage: localeTag,
+			description: t.meta.description,
+			publisher: { "@type": "Organization", name: "301 OA" },
+		},
+		{
+			"@type": "SoftwareApplication",
+			name: "301 OA",
+			applicationCategory: "BusinessApplication",
+			operatingSystem: "Web",
+			description: t.meta.description,
+			inLanguage: locales.map((l) => localeTags[l]),
+			offers: {
+				"@type": "Offer",
+				availability: "https://schema.org/InStock",
+				price: "0",
+				priceCurrency: "USD",
+			},
+			audience: {
+				"@type": "Audience",
+				audienceType:
+					"Schools, campuses, factories, and companies",
+			},
+			featureList: t.features.items.map((i) => i.title),
+		},
+	],
+};
+---
+
+<!doctype html>
+<html lang={localeTag}>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="keywords" content={t.meta.keywords} />
+		<meta name="author" content="301 OA" />
+		<meta name="robots" content="index, follow, max-image-preview:large" />
+		<meta name="theme-color" content="#4f46e5" />
+
+		<link rel="canonical" href={canonical} />
+		{
+			alternateLinks.map((a) => (
+				<link rel="alternate" hreflang={a.lang} href={a.href} />
+			))
+		}
+		<link
+			rel="alternate"
+			hreflang="x-default"
+			href={new URL(pathForLang("en", path), site).href}
+		/>
+
+		{/* Open Graph */}
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="301 OA" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:locale" content={localeTag.replace("-", "_")} />
+		{
+			locales
+				.filter((l) => l !== lang)
+				.map((l) => (
+					<meta
+						property="og:locale:alternate"
+						content={localeTags[l].replace("-", "_")}
+					/>
+				))
+		}
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:alt" content={t.meta.ogImageAlt} />
+
+		{/* Twitter */}
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImage} />
+		<meta name="twitter:image:alt" content={t.meta.ogImageAlt} />
+
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" sizes="32x32" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+
+		{/* Fonts — latin + CJK-friendly stack via system; Inter for latin UI */}
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+	</head>
+	<body class="min-h-dvh flex flex-col">
+		<script is:inline define:vars={{ lang, storageKey: STORAGE_KEY }}>
+			try {
+				localStorage.setItem(storageKey, lang);
+			} catch (e) {}
+		</script>
+		<slot />
+	</body>
+</html>

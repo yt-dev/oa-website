@@ -1,0 +1,45 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import Hero from "../../components/Hero.astro";
+import Features from "../../components/Features.astro";
+import Schools from "../../components/Schools.astro";
+import Security from "../../components/Security.astro";
+import Gallery from "../../components/Gallery.astro";
+import Steps from "../../components/Steps.astro";
+import Cta from "../../components/Cta.astro";
+import { getDictionary } from "../../i18n";
+import { isLang, locales, type Lang } from "../../i18n/ui";
+
+export function getStaticPaths() {
+	return locales.map((lang) => ({ params: { lang } }));
+}
+
+const { lang: raw } = Astro.params;
+if (!raw || !isLang(raw)) {
+	return Astro.redirect("/", 302);
+}
+const lang = raw as Lang;
+const t = getDictionary(lang);
+---
+
+<BaseLayout lang={lang} t={t}>
+	<a
+		href="#main"
+		class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:shadow-lg"
+	>
+		Skip to content
+	</a>
+	<Header lang={lang} t={t} />
+	<main id="main" class="flex-1">
+		<Hero t={t} />
+		<Features t={t} />
+		<Schools t={t} />
+		<Security t={t} />
+		<Gallery t={t} />
+		<Steps t={t} />
+		<Cta t={t} />
+	</main>
+	<Footer lang={lang} t={t} />
+</BaseLayout>

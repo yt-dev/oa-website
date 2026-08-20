@@ -1,0 +1,49 @@
+---
+import type { Dictionary } from "../i18n";
+import ImageSlot from "./ImageSlot.astro";
+
+interface Props {
+  t: Dictionary;
+}
+
+const { t } = Astro.props;
+
+const files: Record<string, string> = {
+  "hero-console": "/images/hero-console.webp",
+  rooms: "/images/feature-rooms.webp",
+  tv: "/images/feature-tv.webp",
+  visitors: "/images/feature-visitors.webp",
+};
+---
+
+<section id="gallery" class="scroll-mt-20 bg-slate-50 py-20 sm:py-28">
+  <div class="container-max section-pad">
+    <div class="mx-auto max-w-2xl text-center">
+      <p class="text-sm font-semibold uppercase tracking-wider text-indigo-600">
+        {t.nav.gallery}
+      </p>
+      <h2
+        class="mt-3 text-balance text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl"
+      >
+        {t.showcase.title}
+      </h2>
+      <!-- <p class="mt-4 text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
+				{t.showcase.subtitle}
+			</p> -->
+    </div>
+
+    <div class="mt-12 grid gap-5 sm:grid-cols-2">
+      {
+        t.showcase.slots.map((slot) => (
+          <ImageSlot
+            src={files[slot.id] ?? `/images/${slot.id}.webp`}
+            alt={slot.label}
+            label={slot.label}
+            hint={slot.hint}
+            aspect="video"
+          />
+        ))
+      }
+    </div>
+  </div>
+</section>

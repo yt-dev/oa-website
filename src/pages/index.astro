@@ -1,17 +1,60 @@
 ---
-
+import { languages, localeTags, locales, pathForLang } from "../i18n/ui";
 ---
 
+<!doctype html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, nofollow" />
+		<title>301 OA</title>
+		{
+			locales.map((l) => (
+				<link rel="alternate" hreflang={localeTags[l]} href={pathForLang(l)} />
+			))
+		}
+		<link rel="alternate" hreflang="x-default" href={pathForLang("en")} />
+		<script is:inline>
+			(function () {
+				var locales = ["en", "zh", "ja"];
+				var fallback = "zh";
+				var key = "oa.locale";
+				function normalize(value) {
+					if (!value) return fallback;
+					var base = String(value).split("-")[0].toLowerCase();
+					return locales.indexOf(base) !== -1 ? base : fallback;
+				}
+				function detect() {
+					try {
+						var stored = localStorage.getItem(key);
+						if (stored) return normalize(stored);
+					} catch (e) {}
+					if (typeof navigator !== "undefined" && navigator.language) {
+						return normalize(navigator.language);
+					}
+					return fallback;
+				}
+				var lang = detect();
+				try {
+					localStorage.setItem(key, lang);
+				} catch (e) {}
+				location.replace("/" + lang + "/");
+			})();
+		</script>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<noscript>
+			<p>
+				{
+					locales.map((l, i) => (
+						<>
+							{i > 0 && " · "}
+							<a href={pathForLang(l)}>{languages[l]}</a>
+						</>
+					))
+				}
+			</p>
+		</noscript>
 	</body>
 </html>

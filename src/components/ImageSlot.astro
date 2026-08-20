@@ -1,0 +1,110 @@
+---
+/**
+ * Marketing image slot.
+ * Drop files under public/images/ using the same basename as `src`
+ * (e.g. src="/images/hero-console.webp" → public/images/hero-console.webp).
+ * Until the file exists, a polished placeholder is shown.
+ */
+interface Props {
+	src: string;
+	alt: string;
+	label?: string;
+	hint?: string;
+	aspect?: "video" | "wide" | "square" | "portrait";
+	class?: string;
+	priority?: boolean;
+}
+
+const {
+	src,
+	alt,
+	label,
+	hint,
+	aspect = "video",
+	class: className = "",
+	priority = false,
+} = Astro.props;
+
+const aspectClass =
+	aspect === "wide"
+		? "aspect-[21/9]"
+		: aspect === "square"
+			? "aspect-square"
+			: aspect === "portrait"
+				? "aspect-[3/4]"
+				: "aspect-video";
+---
+
+<figure
+	class:list={[
+		"group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100 shadow-sm ring-1 ring-slate-900/5",
+		className,
+	]}
+>
+	<div class:list={["relative w-full overflow-hidden", aspectClass]}>
+		{/* Real image — hide if missing via onerror */}
+		<img
+			src={src}
+			alt={alt}
+			loading={priority ? "eager" : "lazy"}
+			decoding="async"
+			{...(priority ? { fetchpriority: "high" as const } : {})}
+			class="absolute inset-0 z-10 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+			data-image-slot
+			onerror="this.style.display='none'; this.nextElementSibling?.classList.remove('hidden')"
+		/>
+		{/* Placeholder when file not yet provided */}
+		<div
+			class="absolute inset-0 z-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-slate-100 via-indigo-50 to-sky-50 p-6 text-center"
+			data-image-placeholder
+		>
+			<div
+				class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-slate-200/80"
+				aria-hidden="true"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-7 w-7 text-indigo-500"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="1.5"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z"
+					></path>
+				</svg>
+			</div>
+			{label && (
+				<p class="text-sm font-semibold text-slate-800">{label}</p>
+			)}
+			{hint && (
+				<p class="max-w-xs font-mono text-[11px] leading-relaxed text-slate-500">
+					{hint}
+				</p>
+			)}
+		</div>
+	</div>
+	{(label || hint) && (
+		<figcaption class="sr-only">
+			{label}{hint ? ` — ${hint}` : ""}
+		</figcaption>
+	)}
+</figure>
+
+<script>
+	// If image loads, hide placeholder so we don't show both
+	document.querySelectorAll<HTMLImageElement>("[data-image-slot]").forEach((img) => {
+		const showOrHide = () => {
+			const ph = img.nextElementSibling as HTMLElement | null;
+			if (!ph) return;
+			if (img.complete && img.naturalWidth > 0) {
+				ph.classList.add("hidden");
+			}
+		};
+		img.addEventListener("load", showOrHide);
+		showOrHide();
+	});
+</script>
