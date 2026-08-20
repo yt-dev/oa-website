@@ -2,10 +2,13 @@
   "name": "oa-website",
   "type": "module",
   "version": "0.0.1",
+  "engines": {
+    "node": "24.19.0"
+  },
   "scripts": {
-    "dev": "bunx --bun astro dev",
-    "build": "bunx --bun astro build",
-    "preview": "bunx --bun astro preview",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
