@@ -1,20 +1,23 @@
 ---
-import { languages, localeTags, locales, pathForLang } from "../i18n/ui";
+import Seo from "../components/Seo.astro";
+import { getDictionary } from "../i18n";
+import { languages, locales, pathForLang } from "../i18n/ui";
+
+const t = getDictionary("en");
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="robots" content="noindex, nofollow" />
-		<title>301 OA</title>
-		{
-			locales.map((l) => (
-				<link rel="alternate" hreflang={localeTags[l]} href={pathForLang(l)} />
-			))
-		}
-		<link rel="alternate" hreflang="x-default" href={pathForLang("en")} />
+		<Seo
+			lang="en"
+			title={t.meta.title}
+			description={t.meta.description}
+			ogImageAlt={t.meta.ogImageAlt}
+			keywords={t.meta.keywords}
+			robots="noindex, follow, max-image-preview:large"
+			jsonLd={false}
+		/>
 		<script is:inline>
 			(function () {
 				var locales = ["en", "zh", "ja"];
@@ -45,16 +48,19 @@ import { languages, localeTags, locales, pathForLang } from "../i18n/ui";
 	</head>
 	<body>
 		<noscript>
-			<p>
-				{
-					locales.map((l, i) => (
-						<>
-							{i > 0 && " · "}
-							<a href={pathForLang(l)}>{languages[l]}</a>
-						</>
-					))
-				}
-			</p>
+			<main style="font-family:system-ui,sans-serif;max-width:40rem;margin:20vh auto;padding:1.5rem;text-align:center">
+				<p>301 OA</p>
+				<p>
+					{
+						locales.map((l, i) => (
+							<>
+								{i > 0 && " · "}
+								<a href={pathForLang(l)}>{languages[l]}</a>
+							</>
+						))
+					}
+				</p>
+			</main>
 		</noscript>
 	</body>
 </html>

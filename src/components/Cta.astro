@@ -1,5 +1,6 @@
 ---
 import type { Dictionary } from "../i18n";
+import { CONTACT_EMAIL } from "../lib/seo";
 
 interface Props {
 	t: Dictionary;
@@ -34,7 +35,7 @@ const { t } = Astro.props;
 						{t.cta.secondary}
 					</a>
 					<a
-						href="mailto:ytzhbit@gmail.com"
+						href={`mailto:${CONTACT_EMAIL}`}
 						class="inline-flex rounded-full border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15"
 					>
 						{t.cta.primary}

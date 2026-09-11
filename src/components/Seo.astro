@@ -1,0 +1,120 @@
+---
+import {
+	abs,
+	alternateLinks,
+	BRAND_NAME,
+	BACKGROUND_COLOR,
+	buildJsonLd,
+	OG_IMAGE,
+	ogLocale,
+	siteUrl,
+	THEME_COLOR,
+} from "../lib/seo";
+import { localeTags, locales, pathForLang, type Lang } from "../i18n/ui";
+
+interface Props {
+	lang: Lang;
+	title: string;
+	description: string;
+	ogImageAlt: string;
+	/** Path without locale, e.g. "" or "privacy" */
+	path?: string;
+	keywords?: string;
+	robots?: string;
+	featureNames?: string[];
+	jsonLd?: boolean;
+}
+
+const {
+	lang,
+	title,
+	description,
+	ogImageAlt,
+	path = "",
+	keywords,
+	robots = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+	featureNames = [],
+	jsonLd = true,
+} = Astro.props;
+
+const site = siteUrl(Astro.site);
+const localeTag = localeTags[lang];
+const canonical = abs(site, pathForLang(lang, path));
+const ogImage = abs(site, OG_IMAGE.path);
+const alts = alternateLinks(site, path);
+const xDefault = abs(site, pathForLang("en", path));
+
+const graph = jsonLd
+	? buildJsonLd({
+			site,
+			canonical,
+			title,
+			description,
+			localeTag,
+			featureNames,
+			ogImageAlt,
+		})
+	: null;
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content={Astro.generator} />
+<meta name="color-scheme" content="light" />
+<meta name="theme-color" content={THEME_COLOR} />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<meta name="format-detection" content="telephone=no" />
+
+<title>{title}</title>
+<meta name="description" content={description} />
+{keywords && <meta name="keywords" content={keywords} />}
+<meta name="author" content={BRAND_NAME} />
+<meta name="robots" content={robots} />
+<meta name="googlebot" content={robots} />
+
+<link rel="canonical" href={canonical} />
+{
+	alts.map((a) => (
+		<link rel="alternate" hreflang={a.lang} href={a.href} />
+	))
+}
+<link rel="alternate" hreflang="x-default" href={xDefault} />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={BRAND_NAME} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content={ogLocale(localeTag)} />
+{
+	locales
+		.filter((l) => l !== lang)
+		.map((l) => (
+			<meta
+				property="og:locale:alternate"
+				content={ogLocale(localeTags[l])}
+			/>
+		))
+}
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:url" content={ogImage} />
+<meta property="og:image:secure_url" content={ogImage} />
+<meta property="og:image:type" content={OG_IMAGE.type} />
+<meta property="og:image:width" content={String(OG_IMAGE.width)} />
+<meta property="og:image:height" content={String(OG_IMAGE.height)} />
+<meta property="og:image:alt" content={ogImageAlt} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={ogImageAlt} />
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+<link rel="manifest" href="/site.webmanifest" />
+<link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap-index.xml" />
+<meta name="msapplication-TileColor" content={BACKGROUND_COLOR} />
+
+{graph && <script type="application/ld+json" set:html={JSON.stringify(graph)} />}

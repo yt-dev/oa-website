@@ -31,12 +31,14 @@ Explicit `/en/`, `/zh/`, `/ja/` stay as chosen (and that choice is saved).
 
 ## SEO
 
-- Per-locale `<title>`, description, keywords  
-- Canonical + `hreflang` alternates  
-- Open Graph / Twitter cards  
-- JSON-LD `SoftwareApplication`  
-- `@astrojs/sitemap` at build time  
-- `public/robots.txt` (update Sitemap host when deploying)
+- Per-locale `<title>`, description, keywords
+- Canonical + `hreflang` (including `x-default` → English)
+- Open Graph + Twitter `summary_large_image` (1200×630 share image)
+- JSON-LD `@graph`: Organization, WebSite, WebPage, SoftwareApplication
+- `@astrojs/sitemap` at build time (locale pages only; `/` splash and 404 excluded)
+- `src/pages/robots.txt.ts` — absolute `Sitemap:` URL from `site`
+- `/llms.txt` — short product overview for AI crawlers
+- Web app manifest + Apple touch icon
 
 Set production origin:
 
@@ -103,7 +105,8 @@ SITE_URL=https://your-domain.com bun run deploy
 
 - `https://<project>.pages.dev/` language-detects (中 / EN / 日本語)
 - `/en/`, `/zh/`, `/ja/` each have the right `<html lang>`
-- `/sitemap-index.xml` and `/robots.txt`
+- `/sitemap-index.xml`, `/robots.txt`, and `/llms.txt`
+- Share preview: `og:image` is `/images/og-default.png` (open a locale URL in [opengraph.xyz](https://www.opengraph.xyz/) or the Facebook Sharing Debugger)
 - Screenshots in `public/images/` if you added them before the build
 
 ## Images

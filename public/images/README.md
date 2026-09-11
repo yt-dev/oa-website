@@ -8,7 +8,8 @@ Drop product screenshots here. The site shows a styled **placeholder** until eac
 | `feature-rooms.webp` | Gallery — room booking | 1280×720 |
 | `feature-tv.webp` | Gallery — TV dashboard | 1280×720 |
 | `feature-visitors.webp` | Gallery — visitor welcome | 1280×720 |
-| `og-default.webp` | Open Graph / social share | 1200×630 |
+| `og-default.png` | Open Graph / social share (canonical) | 1200×630 |
+| `og-default.webp` | Same share art, smaller file | 1200×630 |
 
 Tips:
 
